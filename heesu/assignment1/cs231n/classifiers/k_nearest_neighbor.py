@@ -1,6 +1,7 @@
 from builtins import range
 from builtins import object
 import numpy as np
+from past.builtins import xrange
 
 
 class KNearestNeighbor(object):
@@ -77,7 +78,7 @@ class KNearestNeighbor(object):
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
                 test_instance = X[i]
                 train_instance = self.X_train[j]
-                distance = np.sum((test_instance - train_instance)**2)
+                distance = np.sqrt(np.sum((test_instance - train_instance)**2))
                 dists[i][j] = distance
 
 
@@ -105,7 +106,7 @@ class KNearestNeighbor(object):
 
             test_instance = X[i]
             train_instances = self.X_train
-            distances = map(test_instance - train_instances,lambda inst:np.sum(inst**2))
+            distances = np.sqrt(np.sum((test_instance - train_instances)**2,axis=1))
             dists[i] = distances
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -136,11 +137,13 @@ class KNearestNeighbor(object):
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        test_stack = np.tile(X,(1,num_train))
-        train_stack = np.tile(self.X_train,(num_test,1))
-        dists = np.sum(test_stack-train_stack,axis=2)
+        test_square = np.sum(np.square(X),axis=1).reshape(num_test,1)
+        train_square = np.sum(np.square(self.X_train),axis=1).reshape(1,num_train)
+        dists = np.sqrt(test_square + train_square - 2*np.dot(X,self.X_train.T))
 
-        # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+        # *****END OF YOUR CODE (
+        # 
+        # DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
     def predict_labels(self, dists, k=1):
@@ -172,7 +175,7 @@ class KNearestNeighbor(object):
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
            
             closest_idxs = dists[i].argsort()[:k]
-            closest_y.append([self.y_train[idx] for idx in closest_idxs])
+            closest_y=[self.y_train[idx] for idx in closest_idxs]
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
@@ -183,9 +186,15 @@ class KNearestNeighbor(object):
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-            max_label_idx = np.argmax(np.unique(np.array(closest_y[i]),return_counts=True)[1])
+            # print(np.unique(np.array(closest_y),return_counts=True))
+            # print(closest_y)
+            # print(np.unique(np.array(closest_y),return_counts=True)[1])
+            # print(closest_y)
+            # print(np.unique(np.array(closest_y),return_counts=True)[1])
+            # print(max_label_idx)
+            y_pred[i]= max(closest_y,key=closest_y.count) 
+            # y_pred[i]= closest_y[max_label_idx] 
 
-            y_pred[i]= closest_y[i][max_label_idx] 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         return y_pred
