@@ -66,8 +66,11 @@ class LinearClassifier(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
-
+            mask=np.random.choice(range(num_train),batch_size)
+            
+            X_batch=X[mask]
+            y_batch=y[mask]
+           
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
             # evaluate loss and gradient
@@ -81,7 +84,7 @@ class LinearClassifier(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            self.W=self.W-grad*learning_rate
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -110,13 +113,14 @@ class LinearClassifier(object):
         # Implement this method. Store the predicted labels in y_pred.            #
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-        pass
+        y_pred = X.dot(self.W).argmax(axis = 1)
+        
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return y_pred
 
     def loss(self, X_batch, y_batch, reg):
+        
         """
         Compute the loss function and its derivative.
         Subclasses will override this.
@@ -138,6 +142,7 @@ class LinearSVM(LinearClassifier):
     """ A subclass that uses the Multiclass SVM loss function """
 
     def loss(self, X_batch, y_batch, reg):
+        
         return svm_loss_vectorized(self.W, X_batch, y_batch, reg)
 
 
